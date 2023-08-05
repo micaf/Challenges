@@ -27,18 +27,14 @@ class ProductManger {
     }
 
 
-    addProduct(title = "Untitled Product", description = "Description not available", price = 0, thumbnail = "image_not_available.jpg", code = "N/A", stock = 0) {
+    addProduct(title, description, price, thumbnail, code, stock) {
         if (!(title && description && price && thumbnail && code && stock)) {
-            console.log("-----------------------");
             console.log(new Error("All fields are mandatory."));
-            console.log("-----------------------");
             return
         }
 
         if (this.products?.some(product => product.code === code)) {
-            console.log("-----------------------");
             console.log(new Error("Product with the same code already exists."));
-            console.log("-----------------------");
             return
         }
 
@@ -56,37 +52,17 @@ class ProductManger {
 
         this.products.push(newProduct);
 
-        console.log("-----------------------");
-        console.log("Product Added:");
-        console.log(`ID: ${newProduct.id}`);
-        console.log(`Title: ${newProduct.title}`);
-        console.log(`Description: ${newProduct.description}`);
-        console.log(`Price: ${newProduct.price}`);
-        console.log(`Thumbnail: ${newProduct.thumbnail}`);
-        console.log(`Code: ${newProduct.code}`);
-        console.log(`Stock: ${newProduct.stock}`);
-        console.log("-----------------------");
-
+        console.log(`Product Added: ${newProduct}`);
     }
 
 
     getProducts() {
         if (this.products.length === 0) {
-            console.log("-----------------------");
             console.log("No products added yet.");
-            console.log("-----------------------");
         } else {
-            console.log("-----------------------");
             console.log("List of products:");
             this.products.forEach(product => {
-                console.log(`ID: ${product.id}`);
-                console.log(`Title: ${product.title}`);
-                console.log(`Description: ${product.description}`);
-                console.log(`Price: ${product.price}`);
-                console.log(`Thumbnail: ${product.thumbnail}`);
-                console.log(`Code: ${product.code}`);
-                console.log(`Stock: ${product.stock}`);
-                console.log("-----------------------");
+                console.log(`Product: ${product}`);
             });
         }
     }
@@ -95,20 +71,9 @@ class ProductManger {
         const product = this.products.find(product => product.id === id);
 
         if (product) {
-            console.log("-----------------------");
-            console.log("Product Found:");
-            console.log(`ID: ${product.id}`);
-            console.log(`Title: ${product.title}`);
-            console.log(`Description: ${product.description}`);
-            console.log(`Price: ${product.price}`);
-            console.log(`Thumbnail: ${product.thumbnail}`);
-            console.log(`Code: ${product.code}`);
-            console.log(`Stock: ${product.stock}`);
-            console.log("-----------------------");
+            console.log(`Product Found: ${product}`);
         } else {
-            console.log("-----------------------");
             console.log("Not Found");
-            console.log("-----------------------");
         }
     }
 
