@@ -19,8 +19,9 @@ node ProductManagerFileSaver.js
 ### Challenge 3:
 Small application that implements WebSockets and Handlebar. Using a server with Express.js.
 There are two views:
-Home - Where all the products are displayed.
-RealTimeProducts - Here you can add products and get the product added via websockets.
+- Home - Where all the products are displayed.
+- RealTimeProducts - Here you can add products and get the product added via websockets.
+
 HTTP requests are also used.
 
 #### Run
