@@ -1,0 +1,37 @@
+<a href="/api/products" class="btn btn-primary btn-right">Back to Home</a>
+<h1>Real Time Products</h1>
+
+<form id="addProductForm">
+    <h2>Add a new product</h2>
+    <input type="text" name="title" placeholder="Title" title="Please fill out this field" required >
+    <input type="text" name="description" placeholder="Description" required title="Please fill out this field">
+    <input type="text" name="code" placeholder="Code" required title="Please fill out this field">
+    <input type="number" name="price" min="1" placeholder="Price" required title="Please fill out this field">
+    <input type="number" name="stock" min="1" placeholder="Stock" required title="Please fill out this field">
+    <input type="text" name="category" placeholder="Category" required title="Please fill out this field">
+    <div class="custom-file-input-container">
+        <div class="custom-file-input-container">
+            <input type="file" id="thumbnailsInput" name="thumbnails" accept="image/*" multiple>
+            <label for="thumbnailsInput" class="custom-file-input" id="thumbnailsInputLabel">Choose Image(s)</label>
+            <span id="selectedImageCount">0 images selected</span>
+        </div>
+    </div>
+    <button type="submit" value="Submit" id="submitButton">Add Product</button>
+</form>
+
+<!-- Lista de productos -->
+<div id="product-list">
+     {{#each products}}
+        <div class="card" id="product-card-{{this.id}}">
+            <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p class="card-text">Price: ${{this.price}}</p>
+                <button class="btn btn-danger" data-product-id="{{this.id}}">Delete</button>
+            </div>
+        </div>
+        {{/each}}
+</div>
+
+ <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+ <script src="js/script.js">
+ </script>

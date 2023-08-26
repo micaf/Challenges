@@ -1,4 +1,6 @@
-const fs = require('fs');
+import fs from 'fs';
+import path from 'path';
+import {__dirname} from '../path.js'
 
 /**
  * Class for managing products and their persistence to a file.
@@ -16,15 +18,15 @@ class ProductManager {
         this.path = filePath;
 
         /**
-         * Next available ID to assign to a product.
-         * @type {number}
-         */
+     * Next available ID to assign to a product.
+     * @type {number}
+     */
         this.nextId = 1;
 
         /**
-        * List of products.
-        * @type {Array}
-        */
+         * List of products.
+         * @type {Array}
+         */
         this.products = [];
 
         // Initialize the class by loading existing products from the file.
@@ -40,7 +42,7 @@ class ProductManager {
         try {
             const data = await fs.promises.readFile(this.path, 'utf-8');
             this.products = JSON.parse(data);
-            if (this.products.length > 0) {
+            if (this.products.length) {
                 this.nextId = this.products[this.products.length - 1].id + 1;
             }
         } catch (error) {
@@ -57,40 +59,55 @@ class ProductManager {
     }
 
     /**
-     * Adds a new product to the list of products and saves it to the file.
-     * @param {Object} product - The product object to add.
-     * @param {string} product.title - The title of the product.
-     * @param {string} product.description - The description of the product.
-     * @param {number} product.price - The price of the product.
-     * @param {string} product.thumbnail - The path to the product image.
-     * @param {string} product.code - The unique code identifier of the product.
-     * @param {number} product.stock - The quantity of units available in stock.
-     * @throws {Error} If any mandatory field is missing or if a product with the same code already exists.
+     * Validates the fields of a product.
+     * @param {Object} product - The product object to validate.
+     * @throws {Error} If any mandatory field is missing.
      */
-    async addProduct(product) {
-        const { title, description, price, thumbnail, code, stock } = product;
+    validateProductFields(product) {
+        const requiredFields = ["title", "description", "price", "category", "code", "stock"];
+        const missingFields = requiredFields.filter(field => !product[field]);
 
-        if (!(title && description && price && thumbnail && code && stock)) {
-            throw new Error("All fields are mandatory.");
+        if (missingFields.length > 0) {
+            throw new Error(`Missing fields: ${missingFields.join(", ")}`);
         }
+    }
 
+    /**
+     * Validates whether a product with the same code already exists.
+     * @param {string} code - The code of the product to validate.
+     * @throws {Error} If a product with the same code already exists.
+     */
+    validateDuplicateCode(code) {
         if (this.products.some(existingProduct => existingProduct.code === code)) {
             throw new Error("Product with the same code already exists.");
         }
+    }
+
+    /**
+     * Adds a new product to the list of products and saves it to the file.
+     * @param {Object} product - The product object to add.
+     */
+    async addProduct(product) {
+        const { title, description, code, price, status, stock, category, thumbnails } = product
+        this.validateProductFields(product);
+        this.validateDuplicateCode(product.code);
 
         const newProduct = {
-            id: this.nextId,
+            id: this.nextId, // Generate a unique ID
             title: title,
             description: description,
-            price: price,
-            thumbnail: thumbnail,
             code: code,
-            stock: stock
+            price: price,
+            status: status,
+            stock: stock,
+            category: category,
+            thumbnails: thumbnails
         };
 
-        this.nextId++;
         this.products.push(newProduct);
+        this.nextId++;
         await this.saveProducts();
+        return newProduct;
     }
 
     /**
@@ -101,13 +118,13 @@ class ProductManager {
         return this.products;
     }
 
-     /**
+    /**
      * Searches for and returns a product by its ID.
      * @param {number} id - The ID of the product to find.
      * @returns {Promise<Object>} - The found product object.
      * @throws {Error} If the product with the specified ID is not found.
      */
-     async getProductById(id) {
+    async getProductById(id) {
         const product = this.products.find(product => product.id === id);
 
         if (!product) {
@@ -121,17 +138,25 @@ class ProductManager {
      * Updates an existing product in the list and saves it to the file.
      * @param {number} id - The ID of the product to update.
      * @param {Object} updatedFields - The updated fields of the product.
+     * @returns {Promise<Object>} - The updated product object.
      * @throws {Error} If the product with the specified ID is not found.
      */
     async updateProduct(id, updatedFields) {
         const productIndex = this.products.findIndex(product => product.id === id);
 
-        if (productIndex !== -1) {
-            this.products[productIndex] = { ...this.products[productIndex], ...updatedFields };
-            await this.saveProducts();
-        } else {
+        if (productIndex === -1) {
             throw new Error(`Product with ID ${id} not found.`);
         }
+
+        const updatedProduct = {
+            ...this.products[productIndex],
+            ...updatedFields
+        };
+
+        this.products[productIndex] = updatedProduct;
+        await this.saveProducts();
+
+        return updatedProduct;
     }
 
     /**
@@ -141,63 +166,21 @@ class ProductManager {
      */
     async deleteProduct(id) {
         const productIndex = this.products.findIndex(product => product.id === id);
-
         if (productIndex !== -1) {
+            if(this.products[productIndex].thumbnails?.length){
+                this.products[productIndex].thumbnails.forEach(filename => {
+                    const imagePath = path.join(__dirname, 'public', 'img', filename);
+                    fs.unlinkSync(imagePath);
+                });
+            }
             this.products.splice(productIndex, 1);
             await this.saveProducts();
+            return id
         } else {
             throw new Error(`Product with ID ${id} not found.`);
         }
     }
+
 }
 
-// Usage example...
-(async () => {
-    const productManager = new ProductManager('products.json');
-
-    try {
-        await productManager.addProduct({ title: "T-Shirt", description: "Cotton T-shirt", price: 20, thumbnail: "tshirt.jpg", code: "123456", stock: 10 });
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    try {
-        await productManager.addProduct({ title: "Shoes", description: "Running shoes", price: 60, thumbnail: "shoes.jpg", code: "789012", stock: 30 });
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    try {
-        await productManager.addProduct({ title: "Shoes", description: "Running shoes", price: 60, thumbnail: "shoes.jpg", code: "789012", stock: 30 });
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    try {
-        await productManager.addProduct({ title: "Jacket", description: "Winter jacket", price: 60, thumbnail: "jacket.jpg", code: "555033", stock: 50 });
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    const products = await productManager.getProducts();
-    console.log("List of products:", products);
-
-    try {
-        const product = await productManager.getProductById(1);
-        console.log("Product by ID:", product);
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    try {
-        await productManager.updateProduct(1, { price: 150, stock: 12 });
-    } catch (e) {
-        console.log(e.message);
-    }
-
-    try {
-        await productManager.deleteProduct(2);
-    } catch (e) {
-        console.log(e.message);
-    }
-})();
+export default ProductManager;
