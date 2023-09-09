@@ -29,3 +29,15 @@ cd HandleBar\&Websockets/
 npm install
 npm run dev
 
+### Challenge 3:
+Small application that implements WebSockets, Handlebar and a CRUD with mongoDB. Using a server with Express.js.
+There are three views:
+- Home - Where all the products are displayed.
+- RealTimeProducts - Here you can add products and get the product added via websockets.
+- Chat - Here you can add messages
+
+#### Run
+cd CRUDwithMongoDB
+npm install
+npm run dev
+
