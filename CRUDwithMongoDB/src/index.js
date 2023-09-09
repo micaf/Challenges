@@ -4,22 +4,36 @@ import path from 'path';
 import { Server } from 'socket.io';
 
 import productsRouter from './routes/products.routes.js';
+import messagesRouter from './routes/messages.routes.js';
+import cartRouter from './routes/carts.routes.js'
 import { engine } from 'express-handlebars';
 import { __dirname } from './path.js';
 import mongoose from 'mongoose'
 
 dotenvConfig();
+mongoose.set("strictQuery", false);
+// Wait for database to connect, logging an error if there is a problem
+main().catch((err) => console.log(err));
+
+async function main()  {
+    try {
+        await mongoose.connect("mongodb+srv://micaelafuentes:password@ecommerce.fexxjg5.mongodb.net/?retryWrites=true&w=majority", {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          dbName: 'ecommerce'
+        });
+        console.log('BDD connected');
+      } catch (error) {
+        console.error('Error in connection to BDD', error);
+      }
+}
+
 
 // Create an instance of the Express application
 const app = express();
-mongoose.set("strictQuery", false);
 
-// Connect with MongoDB
- mongoose.connect("mongodb+srv://micaelafuentes:p4ssw0rd@ecommerce.fexxjg5.mongodb.net/?retryWrites=true&w=majority")
-    .then((data) => console.log('BDD connected'))
-    .catch((err) => console.log('Error in connection to BDD', err))
 
-    mongoose.set('debug', true);
+mongoose.set('debug', true);
 
 
 // Middleware to parse incoming JSON data
@@ -52,6 +66,8 @@ io.on('connection', (socket) => {
 
 // Mount the productsRouter under the '/api/products' path
 app.use('/api/products', productsRouter);
+app.use('/api/chat', messagesRouter);
+app.use('/api/carts', cartRouter);
 
 // Export the io instance for use in other parts of the application
 export { io };

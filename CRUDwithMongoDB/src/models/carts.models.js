@@ -2,7 +2,6 @@ import { Schema, model } from "mongoose";
 
 const cartSchema = new Schema({
     products: {
-        products: {
             type: [
                 {
                     id_prod: {
@@ -19,9 +18,7 @@ const cartSchema = new Schema({
             default: function () {
                 return [];
             }
-        }
     }
-
 })
 
 export const cartModel = model('carts', cartSchema)

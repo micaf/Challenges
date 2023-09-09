@@ -1,0 +1,16 @@
+<a href="/api/products" class="btn btn-primary btn-right">Back to Home</a>
+
+<div id="chat-container">
+    <input id="email-input" type="text" id="email" name="email" placeholder="Email" required>
+    <input id="message-input" type="text" id="message" name="message" placeholder="Mesagge" required>
+    <button id="send-button" type="button">Send</button>
+
+     <div id="messages">
+            {{#each messages}}
+            <div class="message-card"><p><strong>{{this.email}}:</strong> {{this.message}}</p></div>
+            {{/each}}
+        </div>
+</div>
+
+ <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="js/chat.js"></script>

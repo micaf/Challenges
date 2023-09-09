@@ -77,6 +77,9 @@ h2 {
 #addProductForm input[type="text"],
 #addProductForm input[type="number"],
 #addProductForm input[type="file"],
+#email-input,
+#message-input,
+#send-button,
 #addProductForm button {
   padding: 10px;
   border: 1px solid #ccc;
@@ -109,7 +112,7 @@ h2 {
 
 /* Button styles */
 .btn,
-#addProductForm button {
+#addProductForm button, #send-button {
   display: inline-block;
   margin-top: 20px;
   text-decoration: none;
@@ -155,4 +158,26 @@ h2 {
 /* Hide default file input */
 #thumbnailsInput {
   display: none;
+}
+
+.message-card {
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message-card p {
+  margin: 0;
+}
+
+/* Estilos para el nombre del usuario */
+.message-card strong {
+  color: #333;
+}
+
+#chat-container{
+  margin: 10px 20px;
 }
